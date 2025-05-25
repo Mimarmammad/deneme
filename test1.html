@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Öznub Bot - Sesli Chat</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" />
+  <style>
+    /* Daha önceki stil aynen kalsın */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Comic Sans MS', sans-serif;
+  background: linear-gradient(135deg, #ffb6c1, #ff80ab);
+  color: #333;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-x: hidden;
+}
+
+h1 {
+  margin-right: 20px;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  color: white;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  height: 50px;
+  font-size: 18px;
+  background: linear-gradient(135deg, #ffb6c1, #ff80ab);
+  border-bottom: 5px double #15fff5;
+  z-index: 100;
+  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.70);
+}
+
+.menu-icon {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 30px;
+  cursor: pointer;
+  padding: 15px;
+  margin-right: 10px;
+}
+
+.sidebar {
+  position: fixed;
+  top: 90px;
+  left: -250px;
+  width: 220px;
+  height: calc(60vh - 60px);
+  background-color: transparent; /* Changed to transparent for aesthetic reasons */
+  color: white;
+  padding: 10px;
+  transition: left 0.3s ease;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.icon-button {
+  background: linear-gradient(300deg, #ff5574, #ffc6b1);
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 70%;
+  font-size: 20px;
+  border-radius: 30px;
+  transition: background 0.2s;
+  box-shadow: 8px 16px 8px rgba(0,0,0,5);
+}
+
+.icon-button:hover {
+  background: #ff92a9;
+}
+
+.icon-button span {
+  font-size: 22px;
+}
+
+main {
+  flex-grow: 1;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding-top: 70px;
+}
+
+.chatbox {
+  list-style-type: none;
+  padding-left: 0;
+  flex-grow: 1;
+  padding-bottom: 10px;
+  overflow-y: auto;
+  justify-content: center;
+}
+
+.chat {
+  margin-bottom: 15px;
+  padding: 10px 5px;
+  border-radius: 18px;
+  max-width: 80%;
+  clear: both;
+  margin: 10px;
+}
+
+.outgoing {
+  background-color: #bfffea;
+  color: #333;
+  float: right;
+  box-shadow: 10px 13px 5px rgba(0,0,0,50);
+}
+
+.incoming {
+  background-color: #ffd5df87;
+  color: #333;
+  display: flex;
+  gap: 10px;
+  margin-left: 1px;
+  justify-content: flex-start;
+  text-align: left;
+  align-items: center;
+  border: 1px solid #fff ;
+}
+
+.incoming p {
+  margin: 0;
+  padding-left: 0;
+  text-align: left;
+}
+
+.incoming span {
+  color: #333;
+  font-size: 24px;
+}
+
+.chat p {
+  margin: 0;
+  word-break: break-word;
+}
+
+.chat.incoming p.error {
+  color: red;
+}
+
+.chat-input {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  display: flex;
+  justify-content:center;
+  align-items: center;
+  gap: px;
+  padding: 10px;
+  background: linear-gradient(15deg, #ffb6c1, #ff80ab);
+  z-index: 100;
+}
+
+.chat-input textarea {
+  flex: 1;
+  border: 3px double #00eaff;
+  padding: 10px;
+  border-radius: 10px;
+  resize: none;
+  height: auto;
+  max-height: 100px;
+  overflow-y: auto;
+  margin: 0;
+  width: 100%;
+  font-size: 16px;
+  box-shadow: 0 0 15px 5px rgba(0,0,0,1);
+  font-family: 'Comic Sans MS', sans-serif;
+}
+
+.chat-input span.send {
+  font-size: 35px;
+  text-shadow: 0 0px 1px rgba(0,0,0,1);
+  color: white;
+  padding: 3px;
+  border-radius: 20px;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.chat-input button.mic {
+  font-size: 40px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  color: white;
+  text-shadow: 4px 8px 8px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  transition: background 0.3s;
+}
+
+.chat-input button.mic.recording {
+  background: #ff2e2e;
+  box-shadow: 0 0 15px 5px #ff2e2e;
+}
+
+main, .chatbox {
+  padding-bottom: 100px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 11;
+  display: none;
+}
+
+footer {
+  display: none;
+}
+
+/* Video Overlay Styles */
+.video-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Ensure it's on top */
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 1s ease-out, visibility 1s ease-out;
+}
+
+.video-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.video-overlay video {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
+
+/* Hide chat elements initially */
+#chat-container {
+  display: none; /* Hide the main chat content initially */
+  flex-direction: column;
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
+}
+
+@media only screen and (max-width: 600px) {
+  body {
+    font-size: 14px;
+    padding: 10px;
+  }
+  .chat-input textarea {
+    font-size: 14px;
+  }
+  .icon-button {
+    font-size: 16px;
+    padding: 8px;
+  }
+}
+  </style>
+</head>
+<body>
+
+  <div class="video-overlay" id="videoOverlay">
+    <video id="introVideo" src="audio/intro.mp4" playsinline muted autoplay></video>
+  </div>
+
+  <div id="chat-container">
+    <header>
+      <button id="menuButton" class="menu-icon">☰</button>
+      <h1>Öznub Bot</h1>
+    </header>
+
+    <div id="sidebarMenu" class="sidebar">
+      <button id="youtubeButton" class="icon-button">YouTube</button>
+      <button id="bookButton" class="icon-button">Kitap</button>
+      <button id="trashButton" class="icon-button">Sohbeti Sil</button>
+      <button id="refreshButton" class="icon-button">Yenile</button>
+    </div>
+
+    <main>
+      <ul class="chatbox" id="chatbox">
+        <li class="chat incoming"><p>Merhaba Öznur! Ben Öznub Bot, seninle sohbet etmek için buradayım. Bana ne sormak istersin?</p></li>
+      </ul>
+    </main>
+
+    <div class="chat-input">
+      <textarea id="chatInput" placeholder="Mesajınızı yazın..."></textarea>
+      <button id="micBtn" class="mic material-symbols-outlined" title="Bas konuş">mic</button>
+      <span id="sendChatBtn" class="material-symbols-outlined send" title="Gönder">send</span>
+    </div>
+  </div>
+
+<script>
+  const menuButton = document.getElementById('menuButton');
+  const sidebarMenu = document.getElementById('sidebarMenu');
+  const chatbox = document.getElementById('chatbox');
+  const chatInput = document.getElementById('chatInput');
+  const sendChatBtn = document.getElementById('sendChatBtn');
+  const micBtn = document.getElementById('micBtn');
+  const videoOverlay = document.getElementById('videoOverlay');
+  const introVideo = document.getElementById('introVideo');
+  const chatContainer = document.getElementById('chat-container');
+
+
+  // Replace with your actual API key
+  const API_KEY = "AIzaSyD2GUiG2M5Beo12anFYu3aXkdPjJV3odG4";
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+  function createChat(message, type = 'incoming') {
+    const li = document.createElement('li');
+    li.className = `chat ${type}`;
+    li.innerHTML = `<p>${message}</p>`;
+    chatbox.appendChild(li);
+    chatbox.scrollTop = chatbox.scrollHeight;
+  }
+
+  async function getBotResponse(userMessage) {
+    createChat("Yazıyor...", "incoming");
+
+    let reply;
+    // Özel sorulara özel cevaplar
+    if (userMessage.toLowerCase().includes("senin adın ne")) {
+      reply = "Benim adım Öznurbot, Öznur!";
+    } else if (userMessage.toLowerCase().includes("seni kim yarattı") ||
+               userMessage.toLowerCase().includes("kim yaptı seni") ||
+               userMessage.toLowerCase().includes("nasıl oldun") ||
+               userMessage.toLowerCase().includes("yaratanın kim") ||
+               userMessage.toLowerCase().includes("nasıl var oldun")) {
+      reply = "Seni dünyalar kadar çok seven baban yarattı Öznurcuğum, seninle arkadaş olayım diye!";
+    } else {
+      // Genel sorular için kişiselleştirilmiş prompt
+      const affectionatePhrases = [
+        "Baban sana aşık Öznur, bunu biliyor muydun?",
+        "Dünyada senden güzeli yok Öznurcuğum, sen çok özelsin!",
+        "Sen çok güzelsin Öznur, pırıl pırıl parlıyorsun!",
+        "Ne kadar tatlısın Öznur!",
+        "Öznur, sen harikasın!"
+      ];
+      const randomPhrase = affectionatePhrases[Math.floor(Math.random() * affectionatePhrases.length)];
+
+      const tailoredMessage = `Benim adım Öznur ve 5 yaşındayım. Bana hitap ederken Öznur de ve 5 yaşındaki bir çocuğa uygun, sevecen cevaplar ver. Asla 'anne' kelimesini kullanma, sadece 'baba' kelimesini kullan. Cevaplarına bazen "${randomPhrase}" gibi cümleler ekleyebilirsin. İşte sorduğum soru: ${userMessage}`;
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ role: "user", parts: [{ text: tailoredMessage }] }]
+          })
+        });
+        const data = await res.json();
+        reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Üzgünüm Öznur, cevap veremedim.";
+      } catch (err) {
+        reply = "Üzgünüm Öznur, bir hata oluştu ve cevap veremedim.";
+        console.error("API hatası:", err);
+      }
+    }
+
+    chatbox.lastChild.remove(); // "Yazıyor..." mesajını sil
+    createChat(reply, "incoming");
+    speakText(reply);
+  }
+
+  function speakText(text) {
+    if (!window.speechSynthesis) {
+      console.warn("Tarayıcınız metin okuma özelliğini desteklemiyor.");
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(text);
+    // Türkçe sesi seçmeye çalışalım
+    const voices = speechSynthesis.getVoices();
+    const trVoice = voices.find(v => v.lang.startsWith('tr')) || voices[0];
+    if (trVoice) {
+      utterance.voice = trVoice;
+    } else {
+      console.warn("Türkçe ses bulunamadı, varsayılan ses kullanılacak.");
+    }
+    window.speechSynthesis.speak(utterance);
+  }
+
+  sendChatBtn.onclick = () => {
+    const msg = chatInput.value.trim();
+    if (!msg) return;
+    createChat(msg, "outgoing");
+    chatInput.value = "";
+    getBotResponse(msg);
+  };
+
+  chatInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendChatBtn.click();
+    }
+  });
+
+  menuButton.onclick = () => sidebarMenu.classList.toggle('open');
+
+  document.getElementById("youtubeButton").onclick = () => window.open("https://youtube.com", "_blank");
+  document.getElementById("bookButton").onclick = function() {
+    window.location.href = "azmasal.html";
+  };
+  document.getElementById("trashButton").onclick = () => {
+    chatbox.innerHTML = `<li class="chat incoming"><p>Merhaba Öznur! Ben Öznub Bot, seninle sohbet etmek için buradayım. Bana ne sormak istersin?</p></li>`;
+    speakText("Merhaba Öznur! Ben Öznub Bot, seninle sohbet etmek için buradayım. Bana ne sormak istersin?"); // Speak initial greeting
+  };
+  document.getElementById("refreshButton").onclick = () => location.reload();
+
+  // Ses tanıma (SpeechRecognition) kısmı
+  let recognition;
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = 'tr-TR';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+      micBtn.classList.add('recording');
+      micBtn.title = "Konuşuyor... Bırakmak için tıkla";
+    };
+
+    recognition.onend = () => {
+      micBtn.classList.remove('recording');
+      micBtn.title = "Bas konuş";
+    };
+
+    recognition.onerror = (event) => {
+      micBtn.classList.remove('recording');
+      micBtn.title = "Bas konuş";
+      console.error("Ses tanıma hatası:", event.error);
+      speakText("Üzgünüm Öznur, sesini tanıyamadım. Tekrar dener misin?"); // Speak error message to Öznur
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      chatInput.value = transcript;
+      sendChatBtn.click();
+    };
+  } else {
+    micBtn.disabled = true;
+    micBtn.title = "Tarayıcınız ses tanımayı desteklemiyor.";
+    console.warn("Tarayıcınız ses tanıma özelliğini desteklemiyor.");
+  }
+
+  micBtn.addEventListener('mousedown', () => {
+    if (recognition) recognition.start();
+  });
+  micBtn.addEventListener('mouseup', () => {
+    if (recognition) recognition.stop();
+  });
+  micBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault(); // Prevent scrolling on mobile
+    if (recognition) recognition.start();
+  });
+  micBtn.addEventListener('touchend', (e) => {
+    e.preventDefault(); // Prevent scrolling on mobile
+    if (recognition) recognition.stop();
+  });
+
+  // Video and transition logic
+  introVideo.addEventListener('ended', () => {
+    videoOverlay.classList.add('hidden');
+    // After the transition, remove the video overlay from display flow
+    videoOverlay.addEventListener('transitionend', () => {
+      videoOverlay.style.display = 'none';
+      chatContainer.style.display = 'flex'; // Show the chat container
+      speakText("Merhaba Öznur! Ben Öznub Bot, seninle sohbet etmek için buradayım. Bana ne sormak istersin?");
+    }, { once: true });
+  });
+
+  // Autoplay policy might block video on some browsers.
+  // A common workaround is to play on a user interaction,
+  // or use muted autoplay.
+  // For this example, 'muted autoplay' is used.
+  window.onload = () => {
+    // If for some reason video doesn't play (e.g., policy),
+    // we can fallback to showing the chat directly
+    introVideo.play().catch(error => {
+      console.error("Video autoplay failed:", error);
+      videoOverlay.style.display = 'none';
+      chatContainer.style.display = 'flex';
+      speakText("Merhaba Öznur! Ben Öznub Bot, seninle sohbet etmek için buradayım. Bana ne sormak istersin?");
+    });
+  };
+</script>
+</body>
+</html>
