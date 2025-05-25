@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>NAĞILLAR ALEMİ</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Comic Sans MS', sans-serif;
+  background: linear-gradient(135deg, #ffb6c1, #ff80ab);
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between; /* İkonu ve başlığı ayırmak için */
+      color: white;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      height: 50px;
+      font-size: 18px;
+      background: linear-gradient(135deg, #ffb6c1, #ff80ab);
+      border-bottom: 5px double #15fff5;
+      z-index: 100;
+      box-shadow: 0 10px 10px rgba(0, 0, 0, 0.70);
+    }
+
+    .header-content { /* Başlık metni için yeni bir kapsayıcı */
+        flex-grow: 1;
+        text-align: right; /* Başlık metnini sağa hizala */
+        padding-right: 10px; /* Başlık metninden sağa 10px boşluk */
+    }
+
+    .back-icon {
+        padding-left: 10px; /* İkondandan sola 10px boşluk */
+        cursor: pointer;
+        font-size: 34px; /* İkon boyutu */
+        color: white;
+        text-decoration: none; /* Alt çizgiyi kaldırır */
+    }
+
+
+    main {
+    
+      margin-top: 70px;
+      flex-grow: 1;
+      overflow-x: auto;
+      white-space: nowrap;
+      padding: 10px;
+      background: #fff5fa;
+    }
+    .page {
+      display: inline-block;
+      width: 100vw;
+      vertical-align: top;
+      box-sizing: border-box;
+      padding: 10px;
+    }
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(3, 100px);
+      gap: 15px;
+      justify-items: center;
+      align-items: center;
+    }
+    .icon {
+      width: 80px;
+      height: 80px;
+      margin: 10px;
+      background-color: #ffaadf;
+      border-radius: 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      user-select: none;
+      transition: background-color 0.3s;
+    }
+    .icon:hover, .icon.active {
+      background-color: #ff1493;
+    }
+    .icon img {
+      max-width: 60px;
+      max-height: 60px;
+      pointer-events: none;
+      border-radius: 12px;
+    }
+    #audio-player {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: none;
+      padding: 10px 15px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 -3px 6px rgba(0, 0, 0, 0.1);
+      user-select: none;
+      z-index: 1000;
+    }
+    audio {
+      width: 100%;
+      max-width: 600px;
+      outline: none;
+      border-radius: 10px;
+    }
+    @media (max-width: 768px) {
+      header {
+        font-size: 2rem;
+      }
+      .icon-grid {
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(4, 90px);
+      }
+      .icon {
+        width: 70px;
+        height: 70px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="test1.html" class="back-icon">👈</a> <div class="header-content">NAĞILLAR ALEMİ</div> </header>
+  <main id="pages-container"></main>
+  <div id="audio-player">
+    <audio id="audio" controls></audio>
+  </div>
+
+  <script>
+    const tales = Array.from({ length: 120 }, (_, i) => ({
+      audio: `https://drive.google.com/drive/folders/1Qv95lBzHohuH8_T6J7yDB3pmCM2Ko5GV/audio(${i+1}).mp3`,
+      icon: `https://drive.google.com/drive/folders/1Qv95lBzHohuH8_T6J7yDB3pmCM2Ko5GV/audio(${i+1}).png`
+    }));
+
+    const pagesContainer = document.getElementById('pages-container');
+    const audioPlayer = document.getElementById('audio-player');
+    const audio = document.getElementById('audio');
+    let currentIndex = -1;
+
+    function createPages() {
+      const iconsPerPage = 12;
+      const totalPages = Math.ceil(tales.length / iconsPerPage);
+
+      for (let p = 0; p < totalPages; p++) {
+        const page = document.createElement('section');
+        page.classList.add('page');
+        const grid = document.createElement('div');
+        grid.classList.add('icon-grid');
+
+        tales.slice(p * iconsPerPage, p * iconsPerPage + iconsPerPage).forEach((tale, i) => {
+          const icon = document.createElement('div');
+          icon.className = 'icon';
+          icon.dataset.index = p * iconsPerPage + i;
+
+          const img = document.createElement('img');
+          img.src = tale.icon;
+          img.alt = `Masal ${p * iconsPerPage + i + 1} ikonu`;
+          icon.appendChild(img);
+
+          icon.addEventListener('click', () => playTale(icon.dataset.index));
+          grid.appendChild(icon);
+        });
+
+        page.appendChild(grid);
+        pagesContainer.appendChild(page);
+      }
+    }
+
+    function updateActiveIcons() {
+      document.querySelectorAll('.icon').forEach(ic =>
+        ic.classList.toggle('active', parseInt(ic.dataset.index) === currentIndex)
+      );
+    }
+
+    function playTale(index) {
+      index = Number(index);
+      if (index < 0 || index >= tales.length) return;
+
+      currentIndex = index;
+      updateActiveIcons();
+      audio.src = tales[index].audio;
+      audioPlayer.style.display = 'flex';
+      audio.load();
+      audio.play().catch(e => console.error("Oynatma hatası:", e));
+    }
+
+    audio.addEventListener('ended', () => playTale((currentIndex + 1) % tales.length));
+
+    createPages();
+  </script>
+</body>
+</html>
